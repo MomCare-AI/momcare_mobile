@@ -1,0 +1,63 @@
+name: Flutter CI
+
+# Runs on every push/PR to main. Exists specifically because a commit once
+# reached main with a broken compile (missing imports, a removed color
+# token) that only got caught by manually stashing and re-checking — see
+# CLAUDE.md. This automates that check instead of relying on remembering it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze_test_build:
+    name: Analyze, test, and build (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - run: flutter analyze
+
+      - run: flutter test
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      # A downloadable APK on every run — install straight from the Actions
+      # tab without needing a local Flutter build, matching how this app has
+      # actually been verified all along (build → install on a real device).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
+
+  ios_build_check:
+    name: Verify iOS build (Xcode, no signing)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      # No local Mac exists on this team (see docs/patient-app-plan.md §7) —
+      # this is currently the *only* way iOS build health gets checked at
+      # all. --no-codesign so no Apple Developer account/certificates are
+      # needed just to confirm it compiles.
+      - run: flutter build ios --no-codesign --debug
