@@ -3,6 +3,8 @@
          patient-facing screens exist (docs/patient-app-plan.md). Normal
          permission, granted at install time, no runtime prompt. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:label="momcare_mobile"
         android:name="${applicationName}"

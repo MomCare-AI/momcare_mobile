@@ -18,7 +18,10 @@ class MapPlaceholder extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.7),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -35,19 +38,16 @@ class MapPlaceholder extends StatelessWidget {
           child: Stack(
             children: [
               // Subtle grid suggesting map tiles — not a real map render.
-              CustomPaint(
-                size: Size.infinite,
-                painter: _GridPainter(),
-              ),
+              CustomPaint(size: Size.infinite, painter: _GridPainter()),
               const Positioned(top: 40, left: 60, child: _PinIcon()),
-              const Positioned(top: 110, left: 140, child: _PinIcon(active: true)),
+              const Positioned(
+                top: 110,
+                left: 140,
+                child: _PinIcon(active: true),
+              ),
               const Positioned(top: 70, right: 50, child: _PinIcon()),
               const Positioned(bottom: 30, left: 90, child: _PinIcon()),
-              Positioned(
-                top: 12,
-                left: 12,
-                child: _PreviewBadge(),
-              ),
+              Positioned(top: 12, left: 12, child: _PreviewBadge()),
             ],
           ),
         ),
