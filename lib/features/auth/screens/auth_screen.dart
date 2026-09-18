@@ -365,8 +365,9 @@ class _PrimaryButton extends StatelessWidget {
         onPressed: onPressed,
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.pressed))
+            if (states.contains(WidgetState.pressed)) {
               return AppColors.accentPink;
+            }
             return AppColors.ink;
           }),
           foregroundColor: WidgetStateProperty.all(Colors.white),
