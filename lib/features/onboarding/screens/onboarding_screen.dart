@@ -1,198 +1,208 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_surface.dart';
-import '../../../theme/app_colors.dart';
 import '../../auth/screens/auth_screen.dart';
 import '../../guest/screens/guest_home_screen.dart';
-import '../models/onboarding_slide.dart';
-import '../widgets/onboarding_slide_view.dart';
+import '../widgets/auto_scrolling_row.dart';
+import '../widgets/dashed_tag.dart';
+import '../../../shared/widgets/particle_button.dart';
 
-/// The three onboarding slides. Slide 3's copy is a deliberate, clearly
-/// temporary placeholder — its real clinical message/imagery hasn't been
-/// provided yet, and it must not be invented (docs/patient-app-plan.md's
-/// own "don't guess" rule applies to content, not just API contracts).
-const _slides = [
-  OnboardingSlide(
-    heroIcon: Icons.monitor_heart_outlined,
-    imagePath: 'assets/images/onboard/pexels-mart-production-7088841.jpg',
-    title: 'Continuous care,\nwherever you are',
-    description:
-        'Vitals from your wearable reach your care team automatically — '
-        'no need to remember to check in.',
-  ),
-  OnboardingSlide(
-    heroIcon: Icons.insights_outlined,
-    imagePath: 'assets/images/onboard/pexels-thirdman-7659876.jpg',
-    title: 'Your risk,\nexplained clearly',
-    description:
-        'Every reading is reviewed and graded, so you and your care team '
-        'both know when something needs attention.',
-  ),
-  OnboardingSlide(
-    // TODO(product): replace with the real slide 3 content once provided —
-    // deliberately generic so nothing clinical is invented here. Image is
-    // real (user-supplied), only the copy is a placeholder.
-    heroIcon: Icons.favorite_outline,
-    imagePath: 'assets/images/onboard/pexels-cottonbro-5853666.jpg',
-    title: 'More, on the way',
-    description: 'This slide is a placeholder for content not yet provided.',
-  ),
-];
-
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
   static const path = '/onboarding';
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final _controller = PageController();
-  int _currentPage = 0;
-
-  void _goToSignUp() {
-    context.go(AuthScreen.registerPath);
-  }
-
-  void _goToSignIn() {
-    context.go(AuthScreen.loginPath);
-  }
-
-  void _continueAsGuest() {
-    context.go(GuestHomeScreen.path);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final slide = _slides[_currentPage];
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      // Light status-bar icons — the photo fills the whole screen, behind
-      // the status bar and behind the action buttons, so dark icons could
-      // disappear against it.
-      value: SystemUiOverlayStyle.light,
+      value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: Colors.black,
-        // The image is the entire screen (Stack, not a Column with a
-        // separate footer section) — everything in the foreground (text,
-        // dots, buttons) is ONE bottom-anchored group below, not split
-        // across two independent bottom-aligned widgets (that overlapped
-        // each other — a real bug found on a real device).
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            PageView.builder(
-              controller: _controller,
-              itemCount: _slides.length,
-              onPageChanged: (page) => setState(() => _currentPage = page),
-              itemBuilder: (context, index) =>
-                  OnboardingSlideView(slide: _slides[index]),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                top: false,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-                  child: GlassSurface(
-                    borderRadius: 28,
-                    opacity: 0.6,
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          slide.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppColors.ink,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            height: 1.25,
+                        const SizedBox(height: 32),
+                        // Top Section
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Let's make",
+                                style: GoogleFonts.inter(
+                                  color: Colors.black,
+                                  fontSize: 52,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.0,
+                                  letterSpacing: -1.5,
+                                ),
+                              ),
+                              Text(
+                                "your days",
+                                style: GoogleFonts.playfairDisplay(
+                                  color: Colors.pink, // Pink italic text as requested
+                                  fontSize: 52,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.1,
+                                  letterSpacing: -1.0,
+                                ),
+                              ),
+                              Text(
+                                "healthier",
+                                style: GoogleFonts.inter(
+                                  color: Colors.black,
+                                  fontSize: 52,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.0,
+                                  letterSpacing: -1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Text(
+                                "No Rushing. Only your feelings.",
+                                style: GoogleFonts.inter(
+                                  color: Colors.black87,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          slide.description,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppColors.body,
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
+                        
+                        const Spacer(),
+                        
+                        // Middle Section (Auto-Scrolling Tags)
+                        Column(
+                          children: [
+                            const AutoScrollingRow(
+                              scrollLeft: true,
+                              speed: 30.0,
+                              children: [
+                                DashedTag(label: 'Habits', backgroundColor: Color(0xFFD0E9F9)),
+                                DashedTag(label: '🍏', isEmoji: true),
+                                DashedTag(label: 'Track meals mindfully'),
+                                DashedTag(label: 'Rest', isEmoji: false),
+                                DashedTag(label: '💧', isEmoji: true),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            const AutoScrollingRow(
+                              scrollLeft: false, // Scrolls right
+                              speed: 25.0,
+                              children: [
+                                DashedTag(label: 'Build healthy habits'),
+                                DashedTag(label: '🥦', isEmoji: true),
+                                DashedTag(label: 'Support', backgroundColor: Color(0xFFD0E9F9)),
+                                DashedTag(label: '🧘‍♀️', isEmoji: true),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            const AutoScrollingRow(
+                              scrollLeft: true,
+                              speed: 35.0,
+                              children: [
+                                DashedTag(label: 'Nutrition', backgroundColor: Color(0xFFD0E9F9)),
+                                DashedTag(label: '🥗', isEmoji: true),
+                                DashedTag(label: 'Increase meals nutrition'),
+                                DashedTag(label: '🥑', isEmoji: true),
+                              ],
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 20),
-                        _Dots(count: _slides.length, current: _currentPage),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: GlassButton(
-                            label: 'Get Started',
-                            onPressed: _goToSignUp,
+                        
+                        const Spacer(),
+                        
+                        // Bottom Section
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                height: 64,
+                                child: ParticleButton(
+                                  onPressed: () => context.go(AuthScreen.registerPath),
+                                  animationDuration: const Duration(milliseconds: 800),
+                                  particleColor: Colors.pink,
+                                  particleCount: 60,
+                                  child: ElevatedButton(
+                                    onPressed: null, // Disabled so ParticleButton handles the tap
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.resolveWith((states) {
+                                        return Colors.black; // The outer detector handles tap visual changes if needed, but we just disintegrate
+                                      }),
+                                      foregroundColor: WidgetStateProperty.all(Colors.white),
+                                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                                      shape: WidgetStateProperty.all(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(999),
+                                        ),
+                                      ),
+                                      elevation: WidgetStateProperty.all(0),
+                                    ),
+                                    child: Text(
+                                      'Get Started',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextButton(
+                                onPressed: () => context.go(AuthScreen.loginPath),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                ),
+                                child: Text(
+                                  'I Already Have an Account',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => context.go(GuestHomeScreen.path),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.black54,
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                child: Text(
+                                  'Try as Guest',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: _goToSignIn,
-                          child: const Text('Already have an account? Sign In'),
-                        ),
-                        TextButton(
-                          onPressed: _continueAsGuest,
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.faint,
-                          ),
-                          child: const Text('Try as Guest'),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         ),
       ),
-    );
-  }
-}
-
-class _Dots extends StatelessWidget {
-  const _Dots({required this.count, required this.current});
-
-  final int count;
-  final int current;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(count, (index) {
-        final active = index == current;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOut,
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: active ? 22 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            // These sit on the light glass panel now, not the photo
-            // directly, so brand-colored dots read correctly.
-            color: active ? AppColors.brand : AppColors.brand.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        );
-      }),
     );
   }
 }
