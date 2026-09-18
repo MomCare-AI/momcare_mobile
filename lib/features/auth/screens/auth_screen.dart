@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_surface.dart';
-import '../../../shared/widgets/gradient_background.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../theme/app_colors.dart';
-import '../../../theme/app_gradients.dart';
 
 /// Which tab the sliding toggle starts on.
 enum AuthTab { login, register }
@@ -34,26 +33,29 @@ void _showNotConnected(BuildContext context, String title, String message) {
   showDialog<void>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text(title),
-      content: Text(message),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Colors.black12, width: 1),
+      ),
+      title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+      content: Text(message, style: GoogleFonts.inter()),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
+          child: Text(
+            'OK',
+            style: GoogleFonts.inter(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
       ],
     ),
   );
 }
 
-/// One screen, two tabs — Login and Register — switched by a pill-shaped
-/// toggle whose indicator slides between them, backed by a real PageView so
-/// swiping left/right works too, not just tapping the toggle. Real forms,
-/// real client-side validation; submitting shows an honest "not connected
-/// yet" message rather than faking success, same as the rest of this app's
-/// placeholders — there is no patient sign-up/sign-in endpoint on the
-/// backend yet (the only existing RegisterView creates a hospital-admin +
-/// organization, not a patient).
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key, this.initialTab = AuthTab.login});
 
@@ -93,45 +95,57 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GradientBackground(
-        child: SafeArea(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
                 child: Column(
                   children: [
-                    GlassSurface(
-                      borderRadius: 40,
-                      padding: const EdgeInsets.all(16),
-                      child: Image.asset(
-                        'assets/images/momcare_icon.png',
-                        width: 48,
-                        height: 48,
+                    // A simple minimalist icon representation
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.ink, width: 2),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _index == 0 ? 'Welcome back' : 'Create your account',
-                      style: const TextStyle(
-                        color: AppColors.ink,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset('assets/images/momcare_icon.png'),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Choose an option below to continue',
-                      style: TextStyle(color: AppColors.body),
                     ),
                     const SizedBox(height: 24),
+                    Text(
+                      _index == 0 ? 'Welcome back' : 'Join us',
+                      style: GoogleFonts.playfairDisplay(
+                        color: AppColors.ink,
+                        fontSize: 40,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Choose an option below to continue',
+                      style: GoogleFonts.inter(
+                        color: AppColors.body,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                     _AuthToggle(
                       pageController: _pageController,
                       currentIndex: _index,
                       onSelect: _goToTab,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -170,57 +184,65 @@ class _AuthToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassSurface(
-      borderRadius: 26,
-      opacity: 0.5,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.black12),
+      ),
       padding: const EdgeInsets.all(4),
-      child: SizedBox(
-        height: 44,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final segmentWidth = constraints.maxWidth / 2;
-            return AnimatedBuilder(
-              animation: pageController,
-              builder: (context, _) {
-                final page = _page().clamp(0.0, 1.0);
-                return Stack(
-                  children: [
-                    AnimatedPositioned(
-                      duration: const Duration(milliseconds: 80),
-                      curve: Curves.linear,
-                      left: page * segmentWidth,
-                      top: 0,
-                      bottom: 0,
-                      width: segmentWidth,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppGradients.primaryButton,
-                          borderRadius: BorderRadius.circular(22),
-                        ),
+      height: 52,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final segmentWidth = constraints.maxWidth / 2;
+          return AnimatedBuilder(
+            animation: pageController,
+            builder: (context, _) {
+              final page = _page().clamp(0.0, 1.0);
+              return Stack(
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 150),
+                    curve: Curves.easeOutCubic,
+                    left: page * segmentWidth,
+                    top: 0,
+                    bottom: 0,
+                    width: segmentWidth,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        _ToggleLabel(
-                          label: 'Login',
-                          width: segmentWidth,
-                          active: currentIndex == 0,
-                          onTap: () => onSelect(0),
-                        ),
-                        _ToggleLabel(
-                          label: 'Register',
-                          width: segmentWidth,
-                          active: currentIndex == 1,
-                          onTap: () => onSelect(1),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
+                  ),
+                  Row(
+                    children: [
+                      _ToggleLabel(
+                        label: 'Login',
+                        width: segmentWidth,
+                        active: currentIndex == 0,
+                        onTap: () => onSelect(0),
+                      ),
+                      _ToggleLabel(
+                        label: 'Register',
+                        width: segmentWidth,
+                        active: currentIndex == 1,
+                        onTap: () => onSelect(1),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -249,11 +271,114 @@ class _ToggleLabel extends StatelessWidget {
         child: Center(
           child: Text(
             label,
-            style: TextStyle(
-              color: active ? Colors.white : AppColors.body,
-              fontWeight: FontWeight.w700,
+            style: GoogleFonts.inter(
+              color: active ? AppColors.ink : AppColors.body,
+              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+              fontSize: 15,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MinimalTextField extends StatelessWidget {
+  const _MinimalTextField({
+    required this.controller,
+    required this.label,
+    this.obscureText = false,
+    this.keyboardType,
+    this.validator,
+    this.suffixIcon,
+    this.textCapitalization = TextCapitalization.none,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+  final Widget? suffixIcon;
+  final TextCapitalization textCapitalization;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      validator: validator,
+      textCapitalization: textCapitalization,
+      style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.inter(color: AppColors.body, fontSize: 15),
+        floatingLabelStyle: GoogleFonts.inter(
+          color: AppColors.ink,
+          fontWeight: FontWeight.w600,
+        ),
+        filled: true,
+        fillColor: Colors.transparent,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 20,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.ink, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        suffixIcon: suffixIcon,
+      ),
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.pressed))
+              return AppColors.accentPink;
+            return AppColors.ink;
+          }),
+          foregroundColor: WidgetStateProperty.all(Colors.white),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+          ),
+          elevation: WidgetStateProperty.all(0),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -282,105 +407,90 @@ class _LoginFormState extends State<_LoginForm> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-    _showNotConnected(
-      context,
-      'Sign-in isn’t connected yet',
-      'This form works, but patient sign-in isn’t wired up to the '
-          'backend yet. Nothing was sent.',
-    );
+    // No real backend to authenticate against yet — skip validation so
+    // tapping Login goes straight to Home during frontend-only iteration.
+    // Revert this once real login is wired up.
+    context.go('/home');
   }
 
   void _forgotPassword() {
     _showNotConnected(
       context,
       'Password reset isn’t connected yet',
-      'This will send a reset link once the backend supports it. Nothing '
-          'was sent.',
+      'This will send a reset link once the backend supports it. Nothing was sent.',
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
-      child: GlassSurface(
-        borderRadius: 28,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: _validateEmail,
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            _MinimalTextField(
+              controller: _emailController,
+              label: 'Email Address',
+              keyboardType: TextInputType.emailAddress,
+              validator: _validateEmail,
+            ),
+            const SizedBox(height: 16),
+            _MinimalTextField(
+              controller: _passwordController,
+              label: 'Password',
+              obscureText: _obscurePassword,
+              validator: (v) => _validatePassword(v),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? LucideIcons.eye : LucideIcons.eyeOff,
+                  color: AppColors.body,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Checkbox(
+                    value: _rememberMe,
+                    activeColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    side: const BorderSide(color: Colors.black26),
+                    onChanged: (value) =>
+                        setState(() => _rememberMe = value ?? false),
                   ),
                 ),
-                validator: (value) => _validatePassword(value),
-              ),
-              Row(
-                children: [
-                  Transform.scale(
-                    scale: 0.85,
-                    child: Checkbox(
-                      value: _rememberMe,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                      onChanged: (value) =>
-                          setState(() => _rememberMe = value ?? false),
-                    ),
+                const SizedBox(width: 8),
+                Text(
+                  'Remember me',
+                  style: GoogleFonts.inter(color: Colors.black87, fontSize: 14),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: _forgotPassword,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.accentPink,
+                    padding: EdgeInsets.zero,
                   ),
-                  const Flexible(
-                    child: Text(
-                      'Remember me',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(color: AppColors.body, fontSize: 13),
-                    ),
+                  child: Text(
+                    'Forgot password?',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                   ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: _forgotPassword,
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text('Forgot password?', style: TextStyle(fontSize: 13)),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: GlassButton(label: 'Login', onPressed: _submit),
-              ),
-              const SizedBox(height: 24),
-              const _SocialDivider(),
-              const SizedBox(height: 16),
-              const _SocialButtonsRow(),
-            ],
-          ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            _PrimaryButton(label: 'Login', onPressed: _submit),
+          ],
         ),
       ),
     );
@@ -412,175 +522,73 @@ class _RegisterFormState extends State<_RegisterForm> {
   }
 
   String? _requiredValidator(String? value, String label) {
-    if (value == null || value.trim().isEmpty) {
-      return '$label is required';
-    }
+    if (value == null || value.trim().isEmpty) return '$label is required';
     return null;
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-    _showNotConnected(
-      context,
-      'Sign-up isn’t connected yet',
-      'This form works, but account creation isn’t wired up to the '
-          'backend yet — that endpoint doesn’t exist. Nothing was sent.',
-    );
+    if (!_formKey.currentState!.validate()) return;
+    context.go('/home');
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
-      child: GlassSurface(
-        borderRadius: 28,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _firstNameController,
-                      textCapitalization: TextCapitalization.words,
-                      decoration: const InputDecoration(labelText: 'First name'),
-                      validator: (value) =>
-                          _requiredValidator(value, 'First name'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _lastNameController,
-                      textCapitalization: TextCapitalization.words,
-                      decoration: const InputDecoration(labelText: 'Last name'),
-                      validator: (value) =>
-                          _requiredValidator(value, 'Last name'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email'),
-                validator: _validateEmail,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                    ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _MinimalTextField(
+                    controller: _firstNameController,
+                    label: 'First Name',
+                    textCapitalization: TextCapitalization.words,
+                    validator: (v) => _requiredValidator(v, 'First name'),
                   ),
                 ),
-                validator: (value) => _validatePassword(value, minLength: 8),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _MinimalTextField(
+                    controller: _lastNameController,
+                    label: 'Last Name',
+                    textCapitalization: TextCapitalization.words,
+                    validator: (v) => _requiredValidator(v, 'Last name'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _MinimalTextField(
+              controller: _emailController,
+              label: 'Email Address',
+              keyboardType: TextInputType.emailAddress,
+              validator: _validateEmail,
+            ),
+            const SizedBox(height: 16),
+            _MinimalTextField(
+              controller: _passwordController,
+              label: 'Password',
+              obscureText: _obscurePassword,
+              validator: (v) => _validatePassword(v, minLength: 8),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscurePassword ? LucideIcons.eye : LucideIcons.eyeOff,
+                  color: AppColors.body,
+                ),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: GlassButton(label: 'Register', onPressed: _submit),
-              ),
-              const SizedBox(height: 24),
-              const _SocialDivider(),
-              const SizedBox(height: 16),
-              const _SocialButtonsRow(),
-            ],
-          ),
+            ),
+            const SizedBox(height: 32),
+            _PrimaryButton(label: 'Create Account', onPressed: _submit),
+          ],
         ),
       ),
-    );
-  }
-}
-
-class _SocialDivider extends StatelessWidget {
-  const _SocialDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Row(
-      children: [
-        Expanded(child: Divider(color: AppColors.borderSoft)),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          child: Text('Or continue with', style: TextStyle(color: AppColors.faint)),
-        ),
-        Expanded(child: Divider(color: AppColors.borderSoft)),
-      ],
-    );
-  }
-}
-
-/// Visual only — real Google/Facebook sign-in is out of scope for this
-/// phase (no OAuth wiring, per the same "no fake backend responses" rule
-/// as the forms above). Tapping says so instead of doing nothing.
-class _SocialButtonsRow extends StatelessWidget {
-  const _SocialButtonsRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _SocialButton(
-            label: 'Google',
-            icon: Icons.g_mobiledata_rounded,
-            onTap: () => _showNotConnected(
-              context,
-              'Google sign-in isn’t connected yet',
-              'Social sign-in isn’t wired up to the backend yet.',
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _SocialButton(
-            label: 'Facebook',
-            icon: Icons.facebook_rounded,
-            onTap: () => _showNotConnected(
-              context,
-              'Facebook sign-in isn’t connected yet',
-              'Social sign-in isn’t wired up to the backend yet.',
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GlassButton(
-      label: label,
-      icon: icon,
-      variant: GlassButtonVariant.outlined,
-      onPressed: onTap,
     );
   }
 }
