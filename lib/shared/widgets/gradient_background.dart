@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_colors.dart';
 
-import '../../theme/app_gradients.dart';
-
-/// Full-bleed blue → white → red gradient behind a screen's content — the
-/// backdrop every [GlassSurface] and [GlassButton] is designed to sit on.
-/// Used as the outermost widget inside each screen's Scaffold body.
+/// DEPRECATED: Use standard Scaffold backgroundColor instead.
+/// This is a shim to prevent compilation errors during the UX migration.
 class GradientBackground extends StatelessWidget {
-  const GradientBackground({super.key, required this.child});
-
   final Widget child;
+  
+  const GradientBackground({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: const BoxDecoration(gradient: AppGradients.background),
+      color: AppColors.background,
       child: child,
     );
   }
