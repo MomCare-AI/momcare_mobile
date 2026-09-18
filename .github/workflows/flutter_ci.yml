@@ -4,6 +4,13 @@ name: Flutter CI
 # reached main with a broken compile (missing imports, a removed color
 # token) that only got caught by manually stashing and re-checking — see
 # CLAUDE.md. This automates that check instead of relying on remembering it.
+#
+# flutter-version is pinned (not `channel: stable`) because every run since
+# this workflow was first added failed — `channel: stable` floats to
+# whatever's newest on GitHub's runners, which had drifted well ahead of the
+# Flutter actually installed and developed against locally (3.35.4). Pin
+# bumps here should track a real `flutter upgrade` on a dev machine, not
+# happen silently.
 on:
   push:
     branches: [main]
@@ -19,7 +26,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: 3.35.4
           cache: true
 
       - run: flutter pub get
@@ -51,7 +58,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: 3.35.4
           cache: true
 
       - run: flutter pub get
