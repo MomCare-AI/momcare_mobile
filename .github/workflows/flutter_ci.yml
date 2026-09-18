@@ -22,7 +22,7 @@ jobs:
     name: Analyze, test, and build (Android)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
@@ -44,7 +44,7 @@ jobs:
       # A downloadable APK on every run — install straight from the Actions
       # tab without needing a local Flutter build, matching how this app has
       # actually been verified all along (build → install on a real device).
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: app-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
@@ -54,7 +54,7 @@ jobs:
     name: Verify iOS build (Xcode, no signing)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: subosito/flutter-action@v2
         with:
