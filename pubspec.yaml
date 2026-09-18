@@ -83,7 +83,7 @@ dev_dependencies:
   # Generates the native (pre-Flutter-engine) Android/iOS launch screen from
   # the config below, so it matches the app's actual first frame instead of
   # flashing something different before Flutter starts.
-  flutter_native_splash: ^2.4.3
+  flutter_native_splash: ^2.4.8
 
   # Generates the real app launcher icon from the config below, replacing
   # Flutter's default icon (never actually set before this).
