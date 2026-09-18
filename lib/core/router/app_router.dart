@@ -7,7 +7,7 @@ import '../../features/hospitals/screens/hospital_discovery_screen.dart';
 import '../../features/nutrition/screens/nutrition_screen.dart';
 import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/pregnancy_education/screens/pregnancy_education_screen.dart';
-import '../../screens/placeholder_home_screen.dart';
+import '../../screens/main_home_screen.dart';
 import '../../screens/splash_screen.dart';
 
 /// Flat on purpose — the 4 guest destinations are real, top-level routes,
@@ -28,8 +28,8 @@ final appRouter = GoRouter(
       builder: (context, state) => const OnboardingScreen(),
     ),
     GoRoute(
-      path: PlaceholderHomeScreen.path,
-      builder: (context, state) => const PlaceholderHomeScreen(),
+      path: MainHomeScreen.path,
+      builder: (context, state) => const MainHomeScreen(),
     ),
     GoRoute(
       path: AuthScreen.registerPath,
