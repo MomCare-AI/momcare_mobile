@@ -137,7 +137,7 @@ class _HospitalDiscoveryScreenState
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
                 ),
-                onTap: (_, __) {
+                onTap: (_, _) {
                   setState(() {
                     _selectedHospital = null;
                   });
