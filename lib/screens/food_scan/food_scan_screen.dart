@@ -17,7 +17,7 @@ class _FoodScanScreenState extends State<FoodScanScreen> {
 
   void _capturePhoto() {
     setState(() => _step = 1);
-    
+
     // Simulate AI processing steps
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
@@ -41,10 +41,14 @@ class _FoodScanScreenState extends State<FoodScanScreen> {
 
   Widget _buildCurrentStep() {
     switch (_step) {
-      case 0: return _buildCameraView();
-      case 1: return _buildProcessingView();
-      case 2: return _buildResultsView();
-      default: return const SizedBox.shrink();
+      case 0:
+        return _buildCameraView();
+      case 1:
+        return _buildProcessingView();
+      case 2:
+        return _buildResultsView();
+      default:
+        return const SizedBox.shrink();
     }
   }
 
@@ -147,7 +151,7 @@ class _FoodScanScreenState extends State<FoodScanScreen> {
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -269,7 +273,11 @@ class _FoodScanScreenState extends State<FoodScanScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(LucideIcons.info, size: 16, color: AppColors.primary),
+                const Icon(
+                  LucideIcons.info,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -294,7 +302,11 @@ class _FoodScanScreenState extends State<FoodScanScreen> {
     );
   }
 
-  Widget _buildNutritionRow(String label, String value, {bool isHighlight = false}) {
+  Widget _buildNutritionRow(
+    String label,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -303,7 +315,9 @@ class _FoodScanScreenState extends State<FoodScanScreen> {
           style: GoogleFonts.inter(
             fontSize: isHighlight ? 16 : 15,
             fontWeight: isHighlight ? FontWeight.w600 : FontWeight.w500,
-            color: isHighlight ? AppColors.textPrimary : AppColors.textSecondary,
+            color: isHighlight
+                ? AppColors.textPrimary
+                : AppColors.textSecondary,
           ),
         ),
         Text(

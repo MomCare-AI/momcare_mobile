@@ -14,7 +14,10 @@ class VideoPlaceholder extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.7), width: 1.5),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.7),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -30,28 +33,28 @@ class VideoPlaceholder extends StatelessWidget {
           width: double.infinity,
           color: AppColors.ink,
           child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.play_arrow_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ),
-              child: const Icon(
-                Icons.play_arrow_rounded,
-                color: Colors.white,
-                size: 32,
+              const Positioned(
+                bottom: 12,
+                child: Text(
+                  'Exercise content will appear here',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
               ),
-            ),
-            const Positioned(
-              bottom: 12,
-              child: Text(
-                'Exercise content will appear here',
-                style: TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ),
             ],
           ),
         ),

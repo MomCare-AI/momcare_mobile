@@ -21,7 +21,8 @@ class ParticleButton extends StatefulWidget {
   State<ParticleButton> createState() => _ParticleButtonState();
 }
 
-class _ParticleButtonState extends State<ParticleButton> with SingleTickerProviderStateMixin {
+class _ParticleButtonState extends State<ParticleButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   List<_Particle> _particles = [];
   bool _isDisintegrating = false;
@@ -59,7 +60,7 @@ class _ParticleButtonState extends State<ParticleButton> with SingleTickerProvid
 
   void _triggerAnimation(Size size) {
     if (_isDisintegrating) return;
-    
+
     setState(() {
       _isDisintegrating = true;
       _particles = List.generate(
@@ -67,7 +68,7 @@ class _ParticleButtonState extends State<ParticleButton> with SingleTickerProvid
         (_) => _Particle.random(size, widget.particleColor),
       );
     });
-    
+
     _controller.forward(from: 0.0);
   }
 
@@ -84,7 +85,7 @@ class _ParticleButtonState extends State<ParticleButton> with SingleTickerProvid
             animation: _controller,
             builder: (context, child) {
               final progress = _controller.value;
-              
+
               // Button shrinks and fades
               final buttonScale = 1.0 - (progress * 1.5).clamp(0.0, 1.0);
               final buttonOpacity = 1.0 - (progress * 2).clamp(0.0, 1.0);
@@ -104,7 +105,7 @@ class _ParticleButtonState extends State<ParticleButton> with SingleTickerProvid
                       ),
                     ),
                   ),
-                  
+
                   // The particles
                   if (_isDisintegrating)
                     Positioned.fill(
@@ -117,7 +118,7 @@ class _ParticleButtonState extends State<ParticleButton> with SingleTickerProvid
             },
           ),
         );
-      }
+      },
     );
   }
 }
@@ -144,15 +145,15 @@ class _Particle {
     // Start at a random position inside the button
     final startX = random.nextDouble() * bounds.width;
     final startY = random.nextDouble() * bounds.height;
-    
+
     // Move outwards in any direction
     final angle = random.nextDouble() * 2 * pi;
     final speed = random.nextDouble() * 150 + 50; // pixels per second
     final size = random.nextDouble() * 6 + 2;
-    
+
     // Add slight opacity variation
     final opacity = random.nextDouble() * 0.5 + 0.5;
-    
+
     return _Particle(
       x: startX,
       y: startY,
@@ -178,14 +179,14 @@ class _ParticlePainter extends CustomPainter {
       final distance = p.speed * progress;
       final currentX = p.x + cos(p.angle) * distance;
       final currentY = p.y + sin(p.angle) * distance;
-      
+
       // Fade out towards the end
       final opacity = (1.0 - progress).clamp(0.0, 1.0);
-      
+
       final paint = Paint()
         ..color = p.color.withValues(alpha: p.color.a * opacity)
         ..style = PaintingStyle.fill;
-        
+
       canvas.drawCircle(Offset(currentX, currentY), p.size, paint);
     }
   }

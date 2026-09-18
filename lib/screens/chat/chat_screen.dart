@@ -94,7 +94,9 @@ class ChatScreen extends StatelessWidget {
             backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             radius: 24,
             child: Icon(
-              name.contains('Dr') ? LucideIcons.stethoscope : LucideIcons.heartPulse,
+              name.contains('Dr')
+                  ? LucideIcons.stethoscope
+                  : LucideIcons.heartPulse,
               color: AppColors.primary,
             ),
           ),
@@ -118,8 +120,12 @@ class ChatScreen extends StatelessWidget {
                       time,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        fontWeight: isUnread ? FontWeight.w600 : FontWeight.w400,
-                        color: isUnread ? AppColors.primary : AppColors.textSecondary,
+                        fontWeight: isUnread
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: isUnread
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -137,7 +143,9 @@ class ChatScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: isUnread ? FontWeight.w500 : FontWeight.w400,
-                    color: isUnread ? AppColors.textPrimary : AppColors.textSecondary,
+                    color: isUnread
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -158,7 +166,11 @@ class ChatScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.fileText, color: AppColors.primary, size: 20),
+              const Icon(
+                LucideIcons.fileText,
+                color: AppColors.primary,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Dr. Ahmed',
@@ -209,7 +221,11 @@ class ChatScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(LucideIcons.arrowRight, size: 16, color: AppColors.primary),
+              const Icon(
+                LucideIcons.arrowRight,
+                size: 16,
+                color: AppColors.primary,
+              ),
             ],
           ),
         ],

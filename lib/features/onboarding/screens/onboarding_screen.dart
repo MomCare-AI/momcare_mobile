@@ -48,7 +48,8 @@ class OnboardingScreen extends StatelessWidget {
                               Text(
                                 "your days",
                                 style: GoogleFonts.playfairDisplay(
-                                  color: Colors.pink, // Pink italic text as requested
+                                  color: Colors
+                                      .pink, // Pink italic text as requested
                                   fontSize: 52,
                                   fontStyle: FontStyle.italic,
                                   fontWeight: FontWeight.w600,
@@ -78,9 +79,9 @@ class OnboardingScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         const Spacer(),
-                        
+
                         // Middle Section (Auto-Scrolling Tags)
                         Column(
                           children: [
@@ -88,7 +89,10 @@ class OnboardingScreen extends StatelessWidget {
                               scrollLeft: true,
                               speed: 30.0,
                               children: [
-                                DashedTag(label: 'Habits', backgroundColor: Color(0xFFD0E9F9)),
+                                DashedTag(
+                                  label: 'Habits',
+                                  backgroundColor: Color(0xFFD0E9F9),
+                                ),
                                 DashedTag(label: '🍏', isEmoji: true),
                                 DashedTag(label: 'Track meals mindfully'),
                                 DashedTag(label: 'Rest', isEmoji: false),
@@ -102,7 +106,10 @@ class OnboardingScreen extends StatelessWidget {
                               children: [
                                 DashedTag(label: 'Build healthy habits'),
                                 DashedTag(label: '🥦', isEmoji: true),
-                                DashedTag(label: 'Support', backgroundColor: Color(0xFFD0E9F9)),
+                                DashedTag(
+                                  label: 'Support',
+                                  backgroundColor: Color(0xFFD0E9F9),
+                                ),
                                 DashedTag(label: '🧘‍♀️', isEmoji: true),
                               ],
                             ),
@@ -111,7 +118,10 @@ class OnboardingScreen extends StatelessWidget {
                               scrollLeft: true,
                               speed: 35.0,
                               children: [
-                                DashedTag(label: 'Nutrition', backgroundColor: Color(0xFFD0E9F9)),
+                                DashedTag(
+                                  label: 'Nutrition',
+                                  backgroundColor: Color(0xFFD0E9F9),
+                                ),
                                 DashedTag(label: '🥗', isEmoji: true),
                                 DashedTag(label: 'Increase meals nutrition'),
                                 DashedTag(label: '🥑', isEmoji: true),
@@ -119,33 +129,50 @@ class OnboardingScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         const Spacer(),
-                        
+
                         // Bottom Section
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 24,
+                          ),
                           child: Column(
                             children: [
                               SizedBox(
                                 width: double.infinity,
                                 height: 64,
                                 child: ParticleButton(
-                                  onPressed: () => context.go(AuthScreen.registerPath),
-                                  animationDuration: const Duration(milliseconds: 800),
+                                  onPressed: () =>
+                                      context.go(AuthScreen.registerPath),
+                                  animationDuration: const Duration(
+                                    milliseconds: 800,
+                                  ),
                                   particleColor: Colors.pink,
                                   particleCount: 60,
                                   child: ElevatedButton(
-                                    onPressed: null, // Disabled so ParticleButton handles the tap
+                                    onPressed:
+                                        null, // Disabled so ParticleButton handles the tap
                                     style: ButtonStyle(
-                                      backgroundColor: WidgetStateProperty.resolveWith((states) {
-                                        return Colors.black; // The outer detector handles tap visual changes if needed, but we just disintegrate
-                                      }),
-                                      foregroundColor: WidgetStateProperty.all(Colors.white),
-                                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                                      backgroundColor:
+                                          WidgetStateProperty.resolveWith((
+                                            states,
+                                          ) {
+                                            return Colors
+                                                .black; // The outer detector handles tap visual changes if needed, but we just disintegrate
+                                          }),
+                                      foregroundColor: WidgetStateProperty.all(
+                                        Colors.white,
+                                      ),
+                                      overlayColor: WidgetStateProperty.all(
+                                        Colors.transparent,
+                                      ),
                                       shape: WidgetStateProperty.all(
                                         RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(999),
+                                          borderRadius: BorderRadius.circular(
+                                            999,
+                                          ),
                                         ),
                                       ),
                                       elevation: WidgetStateProperty.all(0),
@@ -162,10 +189,13 @@ class OnboardingScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               TextButton(
-                                onPressed: () => context.go(AuthScreen.loginPath),
+                                onPressed: () =>
+                                    context.go(AuthScreen.loginPath),
                                 style: TextButton.styleFrom(
                                   foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                 ),
                                 child: Text(
                                   'I Already Have an Account',
@@ -176,12 +206,14 @@ class OnboardingScreen extends StatelessWidget {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () => context.go(GuestHomeScreen.path),
+                                onPressed: () =>
+                                    context.go(GuestHomeScreen.path),
                                 style: TextButton.styleFrom(
                                   foregroundColor: Colors.black54,
                                   padding: EdgeInsets.zero,
                                   minimumSize: Size.zero,
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: Text(
                                   'Try as Guest',

@@ -46,74 +46,83 @@ void main() {
       expect(container.read(vitalsProvider).readings, hasLength(1));
     });
 
-    test('moves to empty (not loaded) when there are genuinely no readings',
-        () async {
-      final fake = _FakeVitalsRepository()..nextResult = [];
-      final container = ProviderContainer(
-        overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
-      );
-      addTearDown(container.dispose);
+    test(
+      'moves to empty (not loaded) when there are genuinely no readings',
+      () async {
+        final fake = _FakeVitalsRepository()..nextResult = [];
+        final container = ProviderContainer(
+          overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
 
-      await container.read(vitalsProvider.notifier).fetch();
+        await container.read(vitalsProvider.notifier).fetch();
 
-      expect(container.read(vitalsProvider).status, VitalsStatus.empty);
-    });
+        expect(container.read(vitalsProvider).status, VitalsStatus.empty);
+      },
+    );
 
-    test('moves to error, with a message, when the repository throws',
-        () async {
-      final fake = _FakeVitalsRepository()..shouldThrow = true;
-      final container = ProviderContainer(
-        overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
-      );
-      addTearDown(container.dispose);
+    test(
+      'moves to error, with a message, when the repository throws',
+      () async {
+        final fake = _FakeVitalsRepository()..shouldThrow = true;
+        final container = ProviderContainer(
+          overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
 
-      await container.read(vitalsProvider.notifier).fetch();
+        await container.read(vitalsProvider.notifier).fetch();
 
-      expect(container.read(vitalsProvider).status, VitalsStatus.error);
-      expect(container.read(vitalsProvider).errorMessage, isNotNull);
-    });
+        expect(container.read(vitalsProvider).status, VitalsStatus.error);
+        expect(container.read(vitalsProvider).errorMessage, isNotNull);
+      },
+    );
 
-    test('changing the time range refetches with a wider "since" boundary',
-        () async {
-      final fake = _FakeVitalsRepository();
-      final container = ProviderContainer(
-        overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
-      );
-      addTearDown(container.dispose);
+    test(
+      'changing the time range refetches with a wider "since" boundary',
+      () async {
+        final fake = _FakeVitalsRepository();
+        final container = ProviderContainer(
+          overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
 
-      // Force construction (and its own initial "today" fetch) before
-      // capturing the baseline — reading .notifier for the first time on
-      // the same line as the actual action being tested would silently
-      // fold construction's fetch into the count being measured.
-      final notifier = container.read(vitalsProvider.notifier);
-      final callsBeforeChange = fake.callsWithSince.length;
+        // Force construction (and its own initial "today" fetch) before
+        // capturing the baseline — reading .notifier for the first time on
+        // the same line as the actual action being tested would silently
+        // fold construction's fetch into the count being measured.
+        final notifier = container.read(vitalsProvider.notifier);
+        final callsBeforeChange = fake.callsWithSince.length;
 
-      notifier.setTimeRange(VitalsTimeRange.month);
-      await Future<void>.delayed(Duration.zero);
+        notifier.setTimeRange(VitalsTimeRange.month);
+        await Future<void>.delayed(Duration.zero);
 
-      expect(fake.callsWithSince.length, callsBeforeChange + 1);
-      final todaySince = fake.callsWithSince[callsBeforeChange - 1];
-      final monthSince = fake.callsWithSince[callsBeforeChange];
-      expect(
-        monthSince.isBefore(todaySince),
-        isTrue,
-        reason: 'A month range should look further back than a day range',
-      );
-      expect(container.read(vitalsProvider).timeRange, VitalsTimeRange.month);
-    });
+        expect(fake.callsWithSince.length, callsBeforeChange + 1);
+        final todaySince = fake.callsWithSince[callsBeforeChange - 1];
+        final monthSince = fake.callsWithSince[callsBeforeChange];
+        expect(
+          monthSince.isBefore(todaySince),
+          isTrue,
+          reason: 'A month range should look further back than a day range',
+        );
+        expect(container.read(vitalsProvider).timeRange, VitalsTimeRange.month);
+      },
+    );
 
-    test('setting the same time range again does not trigger a refetch', () async {
-      final fake = _FakeVitalsRepository();
-      final container = ProviderContainer(
-        overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
-      );
-      addTearDown(container.dispose);
+    test(
+      'setting the same time range again does not trigger a refetch',
+      () async {
+        final fake = _FakeVitalsRepository();
+        final container = ProviderContainer(
+          overrides: [vitalsRepositoryProvider.overrideWithValue(fake)],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(vitalsProvider.notifier);
-      final callsBefore = fake.callsWithSince.length;
-      notifier.setTimeRange(VitalsTimeRange.today);
+        final notifier = container.read(vitalsProvider.notifier);
+        final callsBefore = fake.callsWithSince.length;
+        notifier.setTimeRange(VitalsTimeRange.today);
 
-      expect(fake.callsWithSince.length, callsBefore);
-    });
+        expect(fake.callsWithSince.length, callsBefore);
+      },
+    );
   });
 }

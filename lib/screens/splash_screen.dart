@@ -48,10 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: GlassSurface(
             borderRadius: 140,
             padding: const EdgeInsets.all(36),
-            child: Image.asset(
-              'assets/images/momcare_logo.png',
-              width: 180,
-            ),
+            child: Image.asset('assets/images/momcare_logo.png', width: 180),
           ),
         ),
       ),

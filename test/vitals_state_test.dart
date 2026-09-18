@@ -8,32 +8,34 @@ void main() {
   // hand-built per test so each case's intent is visible without cross-
   // referencing the sample data file.
   group('latestValueOf', () {
-    test('returns the newest non-null value, not the single latest reading',
-        () {
-      final now = DateTime.now();
-      final state = VitalsState(
-        status: VitalsStatus.loaded,
-        readings: [
-          // Newest first, matching real backend + repository ordering.
-          VitalReading(
-            id: 'newest',
-            recordedAt: now,
-            source: VitalSource.device,
-            // No hemoglobin on the newest reading — a band doesn't report it.
-          ),
-          VitalReading(
-            id: 'older',
-            recordedAt: now.subtract(const Duration(days: 5)),
-            source: VitalSource.manual,
-            hemoglobin: 11.5,
-          ),
-        ],
-      );
+    test(
+      'returns the newest non-null value, not the single latest reading',
+      () {
+        final now = DateTime.now();
+        final state = VitalsState(
+          status: VitalsStatus.loaded,
+          readings: [
+            // Newest first, matching real backend + repository ordering.
+            VitalReading(
+              id: 'newest',
+              recordedAt: now,
+              source: VitalSource.device,
+              // No hemoglobin on the newest reading — a band doesn't report it.
+            ),
+            VitalReading(
+              id: 'older',
+              recordedAt: now.subtract(const Duration(days: 5)),
+              source: VitalSource.manual,
+              hemoglobin: 11.5,
+            ),
+          ],
+        );
 
-      // The naive "read the latest reading only" bug this test guards
-      // against would return null here instead of 11.5.
-      expect(state.latestValueOf((r) => r.hemoglobin), 11.5);
-    });
+        // The naive "read the latest reading only" bug this test guards
+        // against would return null here instead of 11.5.
+        expect(state.latestValueOf((r) => r.hemoglobin), 11.5);
+      },
+    );
 
     test('returns null when no reading ever carried the vital', () {
       final state = VitalsState(

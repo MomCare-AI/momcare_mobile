@@ -34,7 +34,8 @@ class PregnancyEducationScreen extends StatelessWidget {
               style: TextStyle(color: AppColors.faint, fontSize: 12),
             ),
             const SizedBox(height: 12),
-            for (final topic in sampleEducationTopics) TopicCard(title: topic.title),
+            for (final topic in sampleEducationTopics)
+              TopicCard(title: topic.title),
           ],
         ),
       ),

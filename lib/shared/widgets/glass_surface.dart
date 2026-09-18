@@ -9,9 +9,9 @@ class GlassSurface extends StatelessWidget {
   final dynamic borderRadius;
   final dynamic opacity;
   final dynamic tint;
-  
+
   const GlassSurface({
-    super.key, 
+    super.key,
     required this.child,
     this.padding = const EdgeInsets.all(24.0),
     this.borderRadius,
@@ -21,9 +21,6 @@ class GlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClinicalCard(
-      padding: padding,
-      child: child,
-    );
+    return ClinicalCard(padding: padding, child: child);
   }
 }

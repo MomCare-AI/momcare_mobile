@@ -5,14 +5,11 @@ import '../../theme/app_colors.dart';
 /// This is a shim to prevent compilation errors during the UX migration.
 class GradientBackground extends StatelessWidget {
   final Widget child;
-  
+
   const GradientBackground({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      child: child,
-    );
+    return Container(color: AppColors.background, child: child);
   }
 }

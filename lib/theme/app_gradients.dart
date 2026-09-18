@@ -32,10 +32,14 @@ class AppGradients {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
       colors: [
-        Color.alphaBlend(base.withValues(alpha: tint != null ? 0.35 : 0), Colors.white)
-            .withValues(alpha: high),
-        Color.alphaBlend(base.withValues(alpha: tint != null ? 0.35 : 0), Colors.white)
-            .withValues(alpha: opacity),
+        Color.alphaBlend(
+          base.withValues(alpha: tint != null ? 0.35 : 0),
+          Colors.white,
+        ).withValues(alpha: high),
+        Color.alphaBlend(
+          base.withValues(alpha: tint != null ? 0.35 : 0),
+          Colors.white,
+        ).withValues(alpha: opacity),
       ],
     );
   }

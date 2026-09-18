@@ -33,7 +33,8 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: AuthScreen.registerPath,
-      builder: (context, state) => const AuthScreen(initialTab: AuthTab.register),
+      builder: (context, state) =>
+          const AuthScreen(initialTab: AuthTab.register),
     ),
     GoRoute(
       path: AuthScreen.loginPath,

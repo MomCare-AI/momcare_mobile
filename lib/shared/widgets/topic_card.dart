@@ -26,7 +26,10 @@ class TopicCard extends StatelessWidget {
           ),
           title: Text(
             title,
-            style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           trailing: onTap != null
               ? const Icon(Icons.chevron_right, color: AppColors.faint)
