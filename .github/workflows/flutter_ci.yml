@@ -44,7 +44,7 @@ jobs:
       # A downloadable APK on every run — install straight from the Actions
       # tab without needing a local Flutter build, matching how this app has
       # actually been verified all along (build → install on a real device).
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: app-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
