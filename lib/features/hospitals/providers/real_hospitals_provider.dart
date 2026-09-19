@@ -38,10 +38,11 @@ class RealHospitalsState {
 /// See docs/patient-app-plan.md §3a: these are real-world hospitals, not
 /// MomCare accounts, so there is no appointment relationship to offer here.
 class RealHospitalsNotifier extends StateNotifier<RealHospitalsState> {
-  RealHospitalsNotifier()
-    : super(const RealHospitalsState(status: RealHospitalsStatus.idle));
+  RealHospitalsNotifier({Dio? dio})
+    : _dio = dio ?? Dio(),
+      super(const RealHospitalsState(status: RealHospitalsStatus.idle));
 
-  final Dio _dio = Dio();
+  final Dio _dio;
 
   Future<void> fetchNearby(LatLng center, {double radiusMeters = 5000}) async {
     state = state.copyWith(status: RealHospitalsStatus.loading);
