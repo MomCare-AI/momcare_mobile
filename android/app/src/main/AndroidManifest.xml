@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
-        android:label="momcare_mobile"
+        android:label="MomCare"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -36,6 +36,20 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Physical-device testing (Galaxy A55, Android 16) found taps
+             intermittently dropped across multiple unrelated widgets on two
+             separate screens (onboarding's plain TextButtons and
+             ParticleButton; MainHomeScreen's bottom nav) while every other
+             screen in the app registered taps reliably. That pattern points
+             at the rendering/gesture-dispatch engine, not a single widget
+             bug. Impeller (Vulkan) is a newer backend with known real-device
+             gesture-reliability issues on some Android GPU/driver
+             combinations; falling back to Skia is Flutter's own documented
+             mitigation. Revert if on-device retest shows this made no
+             difference. -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

@@ -1,4 +1,4 @@
-package com.momcare.momcare_mobile
+package com.momcare.patient
 
 import io.flutter.embedding.android.FlutterActivity
 

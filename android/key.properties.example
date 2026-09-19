@@ -1,0 +1,4 @@
+storePassword=<generated store password>
+keyPassword=<generated key password>
+keyAlias=momcare-upload
+storeFile=app/momcare-upload-key.jks
