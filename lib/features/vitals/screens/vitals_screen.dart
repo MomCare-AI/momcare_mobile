@@ -290,27 +290,41 @@ class VitalsScreen extends ConsumerWidget {
     );
   }
 
+  // Title and value+unit are each wrapped in FittedBox(scaleDown) rather
+  // than left to wrap naturally — three cards sharing a row leaves each one
+  // only ~100dp wide, and a plain Text at these font sizes wraps mid-word
+  // ("Temperature" -> "Temperatur"/"e") or mid-number ("118/76" -> "/7"/"6")
+  // once the compound BP value or a longer vital name shows up. Shrinking to
+  // fit handles any label/value/unit length generically instead of hardcoding
+  // "Temperature" or "76" specifically, and keeps everything on one line.
   Widget _buildMeasurementCard(String title, String value, String unit) {
     return ClinicalCard(
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              title,
+              maxLines: 1,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Flexible(
-                child: Text(
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
                   value,
                   style: GoogleFonts.inter(
                     fontSize: 20,
@@ -318,17 +332,17 @@ class VitalsScreen extends ConsumerWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-              ),
-              const SizedBox(width: 3),
-              Text(
-                unit,
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
+                const SizedBox(width: 3),
+                Text(
+                  unit,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -341,12 +355,17 @@ class VitalsScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              title,
+              maxLines: 1,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
           const SizedBox(height: 8),

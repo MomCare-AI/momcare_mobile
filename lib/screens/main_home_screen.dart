@@ -90,31 +90,48 @@ class CustomBottomNavBar extends StatelessWidget {
 
   Widget _buildTabItem(int index) {
     final isSelected = index == selectedIndex;
+    // Material + InkWell instead of a bare GestureDetector — without
+    // CrossAxisAlignment.stretch on the parent Row (below), this Column's
+    // mainAxisSize.min meant the tappable area only covered its own
+    // intrinsic content height (~50dp), vertically centered inside the
+    // 70dp-tall bar, not the full bar height. On the physical test device,
+    // taps here landed unreliably even at coordinates matching the visible
+    // icon/label. Stretching + wrapping in Material/InkWell gives each tab
+    // a real, full-height, full-width hit area with no ambiguity.
     return Expanded(
-      child: GestureDetector(
-        onTap: () => onTap(index),
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icons[index],
-                color: isSelected ? AppColors.primary : Colors.black26,
-                size: 24,
+      child: Semantics(
+        button: true,
+        selected: isSelected,
+        label: labels[index],
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => onTap(index),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icons[index],
+                    color: isSelected ? AppColors.primary : Colors.black26,
+                    size: 24,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    labels[index],
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      color: isSelected ? AppColors.primary : Colors.black26,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                labels[index],
-                style: GoogleFonts.inter(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? AppColors.primary : Colors.black26,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -133,6 +150,9 @@ class CustomBottomNavBar extends StatelessWidget {
         height: 70, // Tall enough for icon + text
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Forces every child (including the tab Expandeds) to a tight
+          // height matching the full 70dp bar — see _buildTabItem's comment.
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildTabItem(0),
             _buildTabItem(1),
