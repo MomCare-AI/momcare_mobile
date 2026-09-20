@@ -41,17 +41,39 @@ class _HospitalDiscoveryScreenState
   bool _hasFetchedForLocation = false;
   bool _hasFitInitialBounds = false;
 
+  // Captured once, up front, rather than via ref.read() inside dispose():
+  // if the whole widget tree (including the ProviderScope above this
+  // screen) is torn down in the same pass — not how a normal in-app
+  // Navigator.pop unmounts this screen, but real in tests that replace the
+  // entire tree at once — Riverpod's ref is no longer usable by the time
+  // dispose() runs. A plain object reference has no such restriction.
+  late final LocationNotifier _locationNotifier;
+
   @override
   void initState() {
     super.initState();
+    _locationNotifier = ref.read(locationProvider.notifier);
     // Don't request immediately, we show the explanation first if undetermined.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = ref.read(locationProvider);
       if (state.permissionState == LocationPermissionState.granted) {
         // If already granted in a previous session, just start tracking
-        ref.read(locationProvider.notifier).requestPermissionAndStartTracking();
+        _locationNotifier.requestPermissionAndStartTracking();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // locationProvider isn't scoped to this screen (it's a plain, not
+    // autoDispose, provider — HospitalMap also reads it), so nothing else
+    // stops the GPS stream when this screen is left. Without this, a
+    // single Hospital Discovery visit would leave high-accuracy tracking
+    // running for the rest of the app session. This only cancels the
+    // active stream; permissionState/currentLocation are left alone so
+    // initState()'s "already granted" fast path still works on return.
+    _locationNotifier.stopTracking();
+    super.dispose();
   }
 
   void _fitBoundsToEverything(

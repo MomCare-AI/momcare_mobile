@@ -101,6 +101,18 @@ class LocationNotifier extends StateNotifier<LocationState> {
     Geolocator.openLocationSettings();
   }
 
+  /// Stops the live GPS stream without discarding permission/location
+  /// state — called when Hospital Discovery (the only screen that starts
+  /// tracking) is left, so high-accuracy tracking doesn't keep running for
+  /// the rest of the app session just because this provider isn't
+  /// recreated. `requestPermissionAndStartTracking()` resumes it correctly
+  /// on return: permissionState/currentLocation are untouched here, so the
+  /// screen's own "already granted last time" fast path still applies.
+  void stopTracking() {
+    _positionStream?.cancel();
+    _positionStream = null;
+  }
+
   @override
   void dispose() {
     _positionStream?.cancel();

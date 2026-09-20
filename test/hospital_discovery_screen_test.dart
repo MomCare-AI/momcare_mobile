@@ -22,6 +22,8 @@ class _FakeLocationNotifier extends LocationNotifier {
     state = initial;
   }
 
+  bool stopTrackingCalled = false;
+
   @override
   Future<void> requestPermissionAndStartTracking() async {
     // No-op. HospitalDiscoveryScreen's initState() calls this itself
@@ -30,6 +32,12 @@ class _FakeLocationNotifier extends LocationNotifier {
     // overwrites a seeded "granted" state with "loading" (the real
     // method's first line), via a real, unmocked Geolocator call. The
     // permission-request flow itself isn't what these tests check.
+  }
+
+  @override
+  void stopTracking() {
+    stopTrackingCalled = true;
+    super.stopTracking();
   }
 }
 
@@ -348,6 +356,42 @@ void main() {
       );
       expect(find.text('Retry'), findsOneWidget);
       expect(find.text('Try again'), findsOneWidget);
+    });
+  });
+
+  group('lifecycle', () {
+    testWidgets('leaving the screen stops the location stream', (tester) async {
+      // Built inline rather than via wrap() so the test can hold a
+      // reference to the fake notifier and check it after disposal.
+      final fakeNotifier = _FakeLocationNotifier(
+        LocationState(
+          permissionState: LocationPermissionState.granted,
+          currentLocation: userLocation,
+        ),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            locationProvider.overrideWith((ref) => fakeNotifier),
+            realHospitalsProvider.overrideWith(
+              (ref) => _FakeRealHospitalsNotifier(loadedHospitalsState),
+            ),
+          ],
+          child: MaterialApp(
+            home: HospitalDiscoveryScreen(tileProvider: _FakeTileProvider()),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(fakeNotifier.stopTrackingCalled, isFalse);
+
+      // Replace the whole tree so HospitalDiscoveryScreen's State is
+      // actually disposed, not just covered by a new route.
+      await tester.pumpWidget(const SizedBox.shrink());
+
+      expect(fakeNotifier.stopTrackingCalled, isTrue);
     });
   });
 }
