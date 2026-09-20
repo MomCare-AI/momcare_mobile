@@ -63,16 +63,45 @@ the other two docs a new feature plan should check against.
 - No unnecessary animation. Accessibility (contrast, tap targets, screen-reader labels)
   is required, not optional.
 
-## Performance
+## Performance & code simplicity
 
-- Don't perform expensive work in `build()`.
-- Avoid unnecessary rebuilds — scope `ref.watch` narrowly.
-- Use lazy lists (`ListView.builder`) for anything that could grow.
-- Dispose every `StreamSubscription`/`AnimationController`/`TextEditingController`/
-  `MapController` you create — the `hospitals` feature does this correctly; match it.
-- Profile (DevTools, **profile build**, not debug) before optimizing based on a guess.
-  Debug-mode jank is not evidence of a real performance problem — see Flutter's own
-  guidance that debug performance isn't representative of release.
+Optimize for runtime behavior, not line count or file count. A 700-line screen that
+rebuilds efficiently outperforms a beautifully decomposed 30-file architecture that
+causes unnecessary rebuilds or duplicate API calls — five lines vs. one line for the
+same expression is free at runtime; what matters is what code executes and how often.
+When something feels slow, work the list in this order: correct API behavior →
+rebuild behavior → network efficiency → rendering → memory → architecture → line count.
+
+**Treat `build()` as a hot path.** Don't perform network requests, expensive
+calculations, or repeated `.map().where().toList()` transforms inside it — derive the
+value once, outside the widget tree, if it doesn't need to change every rebuild.
+
+**Riverpod:**
+- `ref.watch(provider.select((s) => s.items))`, not a broad `ref.watch(provider)`,
+  when the widget only needs `items` — a broad watch rebuilds the whole subtree on any
+  field changing.
+- `ref.read()` instead of `ref.watch()` when the widget doesn't need to rebuild when
+  that value changes (e.g. inside a callback).
+- Don't create a provider/repository/service for trivial UI state or a single call
+  site — see the abstraction checklist below.
+
+**Other real costs:** unnecessary animations/tickers (a per-frame `jumpTo()` with no
+throttle was a real bug here, not a theoretical one — see `auto_scrolling_row.dart`'s
+git history); non-lazy `ListView`/`Column` for anything that could grow (use
+`ListView.builder`/`.separated`); undisposed `StreamSubscription`/`AnimationController`/
+`TextEditingController`/`MapController` (the `hospitals` feature disposes correctly —
+match it).
+
+**Before adding any abstraction (provider, repository, service, wrapper, helper
+class, or extracted widget), ask:** does it remove real duplication? does it isolate
+meaningful business logic? will it actually be reused? does it improve testability?
+does it reduce complexity rather than just move it elsewhere? If no to all, keep the
+code local and simple — don't extract a widget or layer "for architecture" alone.
+
+Profile (DevTools, **profile build**, not debug) before optimizing based on a guess.
+Debug-mode jank is not evidence of a real performance problem — see Flutter's own
+guidance that debug performance isn't representative of release. Don't refactor
+unrelated existing code merely to satisfy these rules.
 
 ## Security & privacy
 
