@@ -30,7 +30,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      backgroundColor: AppColors.background,
       body: IndexedStack(index: _selectedIndex, children: _pages),
       floatingActionButton: Container(
         decoration: BoxDecoration(
