@@ -56,7 +56,7 @@ dependencies:
   lucide_icons: ^0.257.0
 
   flutter_map: ^8.3.2
-  latlong2: ^0.9.1
+  latlong2: ^0.10.1
   geolocator: ^14.0.2
 
   # Opens the device's own maps app for directions to a real hospital found
