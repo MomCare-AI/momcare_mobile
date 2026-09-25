@@ -47,12 +47,17 @@ class _FakeRealHospitalsNotifier extends RealHospitalsNotifier {
   }
 
   @override
-  Future<void> fetchNearby(LatLng center, {double radiusMeters = 5000}) async {
+  Future<void> fetchNearby(
+    LatLng center, {
+    double radiusMeters = 5000,
+    bool forceRefresh = false,
+  }) async {
     // No-op. HospitalDiscoveryScreen's own preserved side effect calls
     // fetchNearby the moment a location is known — without this override,
     // that would immediately overwrite the state these tests seed with a
-    // real, unmocked network call. The real fetch flow is covered
-    // separately in real_hospitals_provider_test.dart.
+    // real, unmocked network call. The real fetch flow (including fallback
+    // endpoints and caching) is covered separately in
+    // real_hospitals_provider_test.dart.
   }
 }
 

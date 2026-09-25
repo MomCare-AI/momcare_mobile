@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../theme/app_colors.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/auth_form_fields.dart';
+import 'verify_email_screen.dart';
 
 /// Which tab the sliding toggle starts on.
 enum AuthTab { login, register }
@@ -283,109 +287,6 @@ class _ToggleLabel extends StatelessWidget {
   }
 }
 
-class _MinimalTextField extends StatelessWidget {
-  const _MinimalTextField({
-    required this.controller,
-    required this.label,
-    this.obscureText = false,
-    this.keyboardType,
-    this.validator,
-    this.suffixIcon,
-    this.textCapitalization = TextCapitalization.none,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final bool obscureText;
-  final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
-  final Widget? suffixIcon;
-  final TextCapitalization textCapitalization;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      validator: validator,
-      textCapitalization: textCapitalization,
-      style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: GoogleFonts.inter(color: AppColors.body, fontSize: 15),
-        floatingLabelStyle: GoogleFonts.inter(
-          color: AppColors.ink,
-          fontWeight: FontWeight.w600,
-        ),
-        filled: true,
-        fillColor: Colors.transparent,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 20,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.ink, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
-        ),
-        suffixIcon: suffixIcon,
-      ),
-    );
-  }
-}
-
-class _PrimaryButton extends StatelessWidget {
-  const _PrimaryButton({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.pressed)) {
-              return AppColors.accentPink;
-            }
-            return AppColors.ink;
-          }),
-          foregroundColor: WidgetStateProperty.all(Colors.white),
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-          ),
-          elevation: WidgetStateProperty.all(0),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-}
-
 class _LoginForm extends StatefulWidget {
   const _LoginForm();
 
@@ -432,14 +333,14 @@ class _LoginFormState extends State<_LoginForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 24),
-            _MinimalTextField(
+            AuthTextField(
               controller: _emailController,
               label: 'Email Address',
               keyboardType: TextInputType.emailAddress,
               validator: _validateEmail,
             ),
             const SizedBox(height: 16),
-            _MinimalTextField(
+            AuthTextField(
               controller: _passwordController,
               label: 'Password',
               obscureText: _obscurePassword,
@@ -490,7 +391,7 @@ class _LoginFormState extends State<_LoginForm> {
               ],
             ),
             const SizedBox(height: 32),
-            _PrimaryButton(label: 'Login', onPressed: _submit),
+            AuthPrimaryButton(label: 'Login', onPressed: _submit),
           ],
         ),
       ),
@@ -498,14 +399,14 @@ class _LoginFormState extends State<_LoginForm> {
   }
 }
 
-class _RegisterForm extends StatefulWidget {
+class _RegisterForm extends ConsumerStatefulWidget {
   const _RegisterForm();
 
   @override
-  State<_RegisterForm> createState() => _RegisterFormState();
+  ConsumerState<_RegisterForm> createState() => _RegisterFormState();
 }
 
-class _RegisterFormState extends State<_RegisterForm> {
+class _RegisterFormState extends ConsumerState<_RegisterForm> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -527,13 +428,39 @@ class _RegisterFormState extends State<_RegisterForm> {
     return null;
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    context.go('/home');
+    final succeeded = await ref
+        .read(authProvider.notifier)
+        .register(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+        );
+    if (!mounted) return;
+    if (succeeded) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              VerifyEmailScreen(email: _emailController.text.trim()),
+        ),
+      );
+      return;
+    }
+    final message =
+        ref.read(authProvider).errorMessage ??
+        "Couldn't create your account. Check your details and try again.";
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final isSubmitting =
+        ref.watch(authProvider.select((s) => s.status)) ==
+        AuthStatus.submittingRegister;
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
       child: Form(
@@ -545,7 +472,7 @@ class _RegisterFormState extends State<_RegisterForm> {
             Row(
               children: [
                 Expanded(
-                  child: _MinimalTextField(
+                  child: AuthTextField(
                     controller: _firstNameController,
                     label: 'First Name',
                     textCapitalization: TextCapitalization.words,
@@ -554,7 +481,7 @@ class _RegisterFormState extends State<_RegisterForm> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _MinimalTextField(
+                  child: AuthTextField(
                     controller: _lastNameController,
                     label: 'Last Name',
                     textCapitalization: TextCapitalization.words,
@@ -564,14 +491,14 @@ class _RegisterFormState extends State<_RegisterForm> {
               ],
             ),
             const SizedBox(height: 16),
-            _MinimalTextField(
+            AuthTextField(
               controller: _emailController,
               label: 'Email Address',
               keyboardType: TextInputType.emailAddress,
               validator: _validateEmail,
             ),
             const SizedBox(height: 16),
-            _MinimalTextField(
+            AuthTextField(
               controller: _passwordController,
               label: 'Password',
               obscureText: _obscurePassword,
@@ -586,7 +513,11 @@ class _RegisterFormState extends State<_RegisterForm> {
               ),
             ),
             const SizedBox(height: 32),
-            _PrimaryButton(label: 'Create Account', onPressed: _submit),
+            AuthPrimaryButton(
+              label: 'Create Account',
+              onPressed: _submit,
+              isLoading: isSubmitting,
+            ),
           ],
         ),
       ),

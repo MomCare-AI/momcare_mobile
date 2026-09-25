@@ -104,11 +104,15 @@ class _HospitalDiscoveryScreenState
   }
 
   // Shared by the top RetryPill and the bottom sheet's own retry button —
-  // one retry mechanism, not two independent ones.
+  // one retry mechanism, not two independent ones. forceRefresh: true since
+  // an explicit Retry tap means the patient wants a real attempt, not the
+  // provider's own short-lived cache silently no-op'ing it.
   void _retryFetch() {
     final currentLocation = ref.read(locationProvider).currentLocation;
     if (currentLocation != null) {
-      ref.read(realHospitalsProvider.notifier).fetchNearby(currentLocation);
+      ref
+          .read(realHospitalsProvider.notifier)
+          .fetchNearby(currentLocation, forceRefresh: true);
     }
   }
 

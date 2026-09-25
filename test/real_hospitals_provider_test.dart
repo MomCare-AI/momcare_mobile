@@ -46,8 +46,45 @@ class _FakeAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
+/// A queue of per-call outcomes (thrown error or a json body+statusCode),
+/// consumed one per `fetch()` call — for exercising the endpoint-fallback
+/// loop (first call throws, second succeeds) and counting how many network
+/// calls actually happened (for the caching tests, where the right number
+/// is zero).
+class _SequenceAdapter implements HttpClientAdapter {
+  _SequenceAdapter(this._steps);
+
+  final List<Object> _steps; // each is either an Exception or a Map body
+  int callCount = 0;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    final step = _steps[callCount];
+    callCount++;
+    if (step is Exception) throw step;
+    return ResponseBody.fromString(
+      jsonEncode(step),
+      200,
+      headers: {
+        Headers.contentTypeHeader: [Headers.jsonContentType],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
 void main() {
   const center = LatLng(33.7294, 73.0931);
+  const farCenter = LatLng(
+    24.8607,
+    67.0011,
+  ); // Karachi — well outside cache radius
 
   group('RealHospitalsNotifier.fetchNearby', () {
     test(
@@ -167,5 +204,119 @@ void main() {
 
       return future;
     });
+
+    test(
+      'falls back to the second endpoint when the first one fails',
+      () async {
+        final adapter = _SequenceAdapter([
+          DioException(
+            requestOptions: RequestOptions(path: '/'),
+            response: Response(
+              requestOptions: RequestOptions(path: '/'),
+              statusCode: 429,
+            ),
+            type: DioExceptionType.badResponse,
+          ),
+          {
+            'elements': [
+              {
+                'type': 'node',
+                'id': 1,
+                'lat': 33.7300,
+                'lon': 73.0935,
+                'tags': {'name': 'Fallback Hospital'},
+              },
+            ],
+          },
+        ]);
+        final dio = Dio()..httpClientAdapter = adapter;
+
+        final notifier = RealHospitalsNotifier(dio: dio);
+        await notifier.fetchNearby(center);
+
+        expect(adapter.callCount, 2, reason: 'first endpoint, then second');
+        expect(notifier.state.status, RealHospitalsStatus.loaded);
+        expect(
+          notifier.state.hospitals.single['hospital'].name,
+          'Fallback Hospital',
+        );
+      },
+    );
+
+    test(
+      'uses a rate-limit-specific message when every endpoint 429s',
+      () async {
+        final rateLimited = DioException(
+          requestOptions: RequestOptions(path: '/'),
+          response: Response(
+            requestOptions: RequestOptions(path: '/'),
+            statusCode: 429,
+          ),
+          type: DioExceptionType.badResponse,
+        );
+        final dio = Dio()
+          ..httpClientAdapter = _SequenceAdapter([rateLimited, rateLimited]);
+
+        final notifier = RealHospitalsNotifier(dio: dio);
+        await notifier.fetchNearby(center);
+
+        expect(notifier.state.status, RealHospitalsStatus.error);
+        expect(notifier.state.errorMessage, contains('busy'));
+      },
+    );
+
+    test('a second fetch at essentially the same location reuses the cache '
+        'instead of hitting the network again', () async {
+      final adapter = _SequenceAdapter([
+        {'elements': []},
+      ]);
+      final dio = Dio()..httpClientAdapter = adapter;
+      final notifier = RealHospitalsNotifier(dio: dio);
+
+      await notifier.fetchNearby(center);
+      // A few meters off, same neighborhood — well inside the cache radius.
+      await notifier.fetchNearby(const LatLng(33.7295, 73.0932));
+
+      expect(
+        adapter.callCount,
+        1,
+        reason: 'second call should be served from cache, no network hit',
+      );
+      expect(notifier.state.status, RealHospitalsStatus.loaded);
+    });
+
+    test(
+      'forceRefresh bypasses the cache and hits the network again',
+      () async {
+        final adapter = _SequenceAdapter([
+          {'elements': []},
+          {'elements': []},
+        ]);
+        final dio = Dio()..httpClientAdapter = adapter;
+        final notifier = RealHospitalsNotifier(dio: dio);
+
+        await notifier.fetchNearby(center);
+        await notifier.fetchNearby(center, forceRefresh: true);
+
+        expect(adapter.callCount, 2);
+      },
+    );
+
+    test(
+      'a fetch for a genuinely different location bypasses the cache',
+      () async {
+        final adapter = _SequenceAdapter([
+          {'elements': []},
+          {'elements': []},
+        ]);
+        final dio = Dio()..httpClientAdapter = adapter;
+        final notifier = RealHospitalsNotifier(dio: dio);
+
+        await notifier.fetchNearby(center);
+        await notifier.fetchNearby(farCenter);
+
+        expect(adapter.callCount, 2);
+      },
+    );
   });
 }
