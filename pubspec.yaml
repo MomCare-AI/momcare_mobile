@@ -43,7 +43,7 @@ dependencies:
 
   # Token storage — Keychain/Keystore-backed, deliberately better than the web portal's
   # documented localStorage gap (docs/PLAN.md §7 "Known gaps").
-  flutter_secure_storage: ^9.2.2
+  flutter_secure_storage: ^11.2.0
 
   # Routing + the eventual invite deep-link. app_links is NOT added yet — only once the
   # invite-accept flow is actually being built (docs/patient-app-plan.md §7).
